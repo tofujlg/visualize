@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 void main() {
   runApp(const MyApp());
@@ -75,11 +76,11 @@ class FirstRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('First Route'),
+        title: const Text('Visualize your goal'),
       ),
       body: Center(
         child: ElevatedButton(
-          child: const Text('Open route'),
+          child: const Text('Start Visualizing'),
           onPressed: () {
             // Navigate to second route when tapped.
             Navigator.push(
@@ -100,16 +101,61 @@ class SecondRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Second Route'),
+        title: const Text('Visualizing screen'),
       ),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: const Text('Go back!'),
-        ),
+        child: CountdownTimer(),
       ),
+    );
+  }
+}
+
+class CountdownTimer extends StatefulWidget {
+  const CountdownTimer({super.key});
+
+  @override
+  State<CountdownTimer> createState() => _CountdownTimerState();
+}
+
+class _CountdownTimerState extends State<CountdownTimer> {
+  late Timer _timer;
+  int _start = 30; // 5 minutes in seconds
+
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+  }
+
+  void startTimer() {
+    const oneSec = Duration(seconds: 1);
+    _timer = Timer.periodic(
+      oneSec,
+      (Timer timer) {
+        if (_start == 0) {
+          setState(() {
+            timer.cancel();
+          });
+        } else {
+          setState(() {
+            _start--;
+          });
+        }
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      '${(_start ~/ 60).toString().padLeft(2, '0')}:${(_start % 60).toString().padLeft(2, '0')}',
+      style: Theme.of(context).textTheme.headlineLarge,
     );
   }
 }
